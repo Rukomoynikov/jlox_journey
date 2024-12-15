@@ -35,6 +35,6 @@ class ScannerTest {
     List<Token> tokens =  scanner.scanTokens();
 
     assertEquals(2, tokens.size());
-//    assertEquals("STRING \"Hello\" null", tokens.get(0).toStrging());
+    assertEquals("NUMBER 11 null", tokens.get(0).toStrging());
   }
 }

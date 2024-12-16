@@ -22,7 +22,9 @@ public class GenerateAst {
     ));
   }
 
-  private static void defineAst(String outputDir, String baseName, List<String> tokens) throws IOException {
+  private static void defineAst(String outputDir,
+                                String baseName,
+                                List<String> tokens) throws IOException {
     String path = outputDir + "/" + baseName + ".java";
     PrintWriter writer = new PrintWriter(path);
 
@@ -65,29 +67,31 @@ public class GenerateAst {
 
     writer.println("    }");
 
-    writer.println();
-    writer.println("    @Override");
-    writer.println("    <R> R accept(Visitor<R> visitor) {");
-    writer.println("      return visitor.visit" + className + baseName + "(this);");
-    writer.println("    }");
-
     // Fields
     writer.println();
     for(String field : fields) {
       writer.println("    final " + field + ";");
     }
 
+    writer.println();
+    writer.println("    @Override");
+    writer.println("    <R> R accept(Visitor<R> visitor) {");
+    writer.println("      return visitor.visit" + className + baseName + "(this);");
+    writer.println("    }");
+
     writer.println("  }");
     writer.println();
   }
 
+  // baseName = "Expr"
+  // types = ("Binary   : Expr left, Token operator, Expr right", "Grouping : Expr expression")
   private static void defineVisitor(PrintWriter writer,
                              String baseName,
-                             List<String> tokens) {
+                             List<String> types) {
     writer.println("  interface Visitor<R> {");
 
-    for(String token: tokens) {
-      String typeName = token.split(" ")[0].trim();
+    for(String type: types) {
+      String typeName = type.split(" ")[0].trim();
 
       writer.println("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
     }

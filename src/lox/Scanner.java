@@ -126,7 +126,7 @@ public class Scanner {
   }
 
   private void addToken(TokenType tokenType, Object literal) {
-    Token token = new Token(tokenType, source.substring(start, current), null, line);
+    Token token = new Token(tokenType, source.substring(start, current), literal, line);
     tokens.add(token);
   }
 

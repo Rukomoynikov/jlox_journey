@@ -1,10 +1,14 @@
 package lox;
 
-public class Interpreter implements Expr.Visitor<Object> {
-  void interpret(Expr expression) {
+import java.util.List;
+
+public class Interpreter implements Expr.Visitor<Object>,
+                                    Stmt.Visitor<Object> {
+  void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expression);
-      System.out.println(stringify(value));
+      for(Stmt statement : statements) {
+        execute(statement);
+      }
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
     }
@@ -79,6 +83,19 @@ public class Interpreter implements Expr.Visitor<Object> {
     return null;
   }
 
+  @Override
+  public Object visitExpressionStmt(Stmt.Expression stmt) {
+    return evaluate(stmt.expression);
+  }
+
+  @Override
+  public Object visitPrintStmt(Stmt.Print expr) {
+    Object value = evaluate(expr.expression);
+
+    System.out.println(stringify(value));
+    return null;
+  }
+
   private Object evaluate(Expr expr) {
     return expr.accept(this);
   }
@@ -113,5 +130,9 @@ public class Interpreter implements Expr.Visitor<Object> {
     if(value instanceof Double) return value.toString();
 
     return value.toString();
+  }
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
   }
 }

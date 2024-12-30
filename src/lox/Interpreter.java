@@ -1,10 +1,16 @@
 package lox;
 
-public class Interpreter implements Expr.Visitor<Object> {
-  void interpret(Expr expression) {
+import java.util.List;
+
+public class Interpreter implements Expr.Visitor<Object>,
+                                    Stmt.Visitor<Void> {
+  private Environment environment = new Environment();
+
+  void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expression);
-      System.out.println(stringify(value));
+      for(Stmt statement : statements) {
+        execute(statement);
+      }
     } catch (RuntimeError error) {
       Lox.runtimeError(error);
     }
@@ -79,6 +85,49 @@ public class Interpreter implements Expr.Visitor<Object> {
     return null;
   }
 
+  @Override
+  public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+    return null;
+  }
+
+  @Override
+  public Void visitPrintStmt(Stmt.Print expr) {
+    Object value = evaluate(expr.expression);
+    System.out.println(stringify(value));
+
+    return null;
+  }
+
+  @Override
+  public Void visitVarStmt(Stmt.Var stmt) {
+    Object value = null;
+    if (stmt.initializer != null) {
+      value = evaluate(stmt.initializer);
+    }
+
+    environment.define(stmt.name.lexeme, value);
+    return null;
+  }
+
+  @Override
+  public Object visitVariableExpr(Expr.Variable expr) {
+    return environment.get(expr.name);
+  }
+
+  @Override
+  public Object visitAssignExpr(Expr.Assign expr) {
+    Object value = evaluate(expr.value);
+    environment.assign(expr.name, value);
+    return value;
+  }
+
+  @Override
+  public Void visitBlockStmt(Stmt.Block stmt) {
+    executeBlock(stmt.statements, new Environment(environment));
+    return null;
+  }
+
   private Object evaluate(Expr expr) {
     return expr.accept(this);
   }
@@ -113,5 +162,21 @@ public class Interpreter implements Expr.Visitor<Object> {
     if(value instanceof Double) return value.toString();
 
     return value.toString();
+  }
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
+  }
+
+  private void executeBlock(List<Stmt> statements, Environment environment) {
+    Environment previous = this.environment;
+    try {
+      this.environment = environment;
+      for(Stmt statement : statements) {
+        execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
   }
 }

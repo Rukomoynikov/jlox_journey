@@ -70,10 +70,18 @@ public class Scanner {
       case ';': addToken(TokenType.SEMICOLON); break;
       case '*': addToken(TokenType.STAR); break;
       // Lexems that may contain two chars
-      case '!': addToken(nextMatch('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
-      case '=': addToken(nextMatch('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
-      case '<': addToken(nextMatch('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
-      case '>': addToken(nextMatch('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+      case '!':
+        addToken(nextMatch('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+        break;
+      case '=':
+        addToken(nextMatch('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+        break;
+      case '<':
+        addToken(nextMatch('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+        break;
+      case '>':
+        addToken(nextMatch('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+        break;
       // Slash or comment and comment can be several chars long
       case '/':
         // Basically we just exclude comments from being lexed
